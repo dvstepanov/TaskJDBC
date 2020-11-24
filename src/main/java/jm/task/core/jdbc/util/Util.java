@@ -1,8 +1,10 @@
 package jm.task.core.jdbc.util;
 
-import com.mysql.cj.xdevapi.SessionFactory;
+import org.hibernate.SessionFactory;
 import org.hibernate.HibernateException;
 import org.hibernate.cfg.*;
+import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
+import jm.task.core.jdbc.model.User;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -29,35 +31,29 @@ public class Util {
         return connection;
     }
 
-    // Connect to MySQL Hibernate
-    /*private static SessionFactory configureSessionFactory()
-            throws HibernateException {
+    private static SessionFactory sessionFactory;
 
-        // Настройки hibernate
-        Configuration configuration = new Configuration()
-                .setProperty( "hibernate.connection.driver_class",
-                        "com.mysql.jdbc.Driver" )
-                .setProperty( "hibernate.connection.url", connectionURL )
-                .setProperty( "hibernate.connection.username", userName )
-                .setProperty( "hibernate.connection.password", password)
-                .setProperty( "hibernate.connection.pool_size", "1" )
-                .setProperty( "hibernate.connection.autocommit", "false" )
-                .setProperty( "hibernate.cache.provider_class",
-                        "org.hibernate.cache.NoCacheProvider" )
-                .setProperty( "hibernate.cache.use_second_level_cache",
-                        "false" )
-                .setProperty( "hibernate.cache.use_query_cache", "false" )
-                .setProperty( "hibernate.dialect",
-                        "org.hibernate.dialect.MySQLDialect" )
-                .setProperty( "hibernate.show_sql","true" )
-                .setProperty( "hibernate.current_session_context_class",
-                        "thread" )
-                .addPackage( "ru.miralab.db" )
-                .addAnnotatedClass(User.class)
-                ;
-        serviceRegistry = new ServiceRegistryBuilder().applySettings(
-                configuration.getProperties()).buildServiceRegistry();
-        return configuration.buildSessionFactory(serviceRegistry);
-    }*/
+    public static SessionFactory getSessionFactory() {
+        if (sessionFactory == null) {
+            try {
+                Configuration configuration = new Configuration()
+                        .setProperty("hibernate.connection.driver_class",
+                                "com.mysql.cj.jdbc.Driver")
+                        .setProperty("hibernate.connection.url", connectionURL)
+                        .setProperty("hibernate.connection.username", userName)
+                        .setProperty("hibernate.connection.password", password)
+                        .setProperty("hibernate.dialect",
+                                "org.hibernate.dialect.MySQLDialect")
+                        .setProperty("hibernate.show_sql", "true")
+                        .addAnnotatedClass(User.class);
 
+                StandardServiceRegistryBuilder builder = new StandardServiceRegistryBuilder().applySettings(configuration.getProperties());
+                sessionFactory = configuration.buildSessionFactory(builder.build());
+
+            } catch (Exception e) {
+                System.out.println("Исключение!" + e);
+            }
+        }
+        return sessionFactory;
+    }
 }
